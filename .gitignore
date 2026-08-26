@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Rust build output
+target/
+
+# Python cache and virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editor and IDE settings
+.idea/
+.vscode/
+*.swp
+*~
