@@ -1,0 +1,96 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x86_64
+            runner: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            source: binary-preview-lsp/target/x86_64-unknown-linux-gnu/release/binary-preview-lsp
+            asset: binary-preview-lsp-linux-x86_64
+          - name: windows-x86_64
+            runner: windows-latest
+            target: x86_64-pc-windows-msvc
+            source: binary-preview-lsp/target/x86_64-pc-windows-msvc/release/binary-preview-lsp.exe
+            asset: binary-preview-lsp-windows-x86_64.exe
+          - name: macos-x86_64
+            runner: macos-14
+            target: x86_64-apple-darwin
+            source: binary-preview-lsp/target/x86_64-apple-darwin/release/binary-preview-lsp
+            asset: binary-preview-lsp-macos-x86_64
+          - name: macos-aarch64
+            runner: macos-14
+            target: aarch64-apple-darwin
+            source: binary-preview-lsp/target/aarch64-apple-darwin/release/binary-preview-lsp
+            asset: binary-preview-lsp-macos-aarch64
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Build release binary
+        shell: bash
+        run: >-
+          cargo build
+          --locked
+          --release
+          --manifest-path binary-preview-lsp/Cargo.toml
+          --target "${{ matrix.target }}"
+
+      - name: Prepare release asset
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp "${{ matrix.source }}" "dist/${{ matrix.asset }}"
+
+      - name: Ad-hoc sign macOS binary
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          codesign --force --sign - "dist/${{ matrix.asset }}"
+          codesign --verify --strict --verbose=2 "dist/${{ matrix.asset }}"
+
+      - name: Upload release asset
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: dist/${{ matrix.asset }}
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download release assets
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Binary Preview ${{ github.ref_name }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: dist/*
