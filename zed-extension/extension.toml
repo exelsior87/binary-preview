@@ -1,11 +1,11 @@
-id = "binary-preview"
+id = "binary-preview-lsp"
 name = "Binary Preview"
 version = "0.1.0"
 schema_version = 1
 
-authors = ["Your Name"]
-description = "Preview binary files from source code paths using hover."
-repository = "https://github.com/your-name/binary-preview"
+authors = ["Ontto"]
+description = "Preview numeric literals and binary files from source code using hover information."
+repository = "https://github.com/exelsior87/binary-preview"
 
 [language_servers.binary-preview]
 name = "Binary Preview"
