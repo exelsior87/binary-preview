@@ -3,6 +3,7 @@
 
 # Rust build output
 target/
+zed-extension/extension.wasm
 
 # Python cache and virtual environments
 __pycache__/

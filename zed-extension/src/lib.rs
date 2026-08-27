@@ -1,4 +1,8 @@
-use std::fs;
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    time::SystemTime,
+};
 
 use zed_extension_api as zed;
 
@@ -41,13 +45,22 @@ impl BinaryPreviewExtension {
             &zed::LanguageServerInstallationStatus::CheckingForUpdate,
         );
 
-        let release = zed::latest_github_release(
+        let release = match zed::latest_github_release(
             GITHUB_REPOSITORY,
             zed::GithubReleaseOptions {
                 require_assets: true,
                 pre_release: false,
             },
-        )?;
+        ) {
+            Ok(release) => release,
+            Err(error) => {
+                if let Some(path) = Self::cached_binary_path_on_disk() {
+                    self.cached_binary_path = Some(path.clone());
+                    return Ok(path);
+                }
+                return Err(error);
+            }
+        };
         let asset_name = Self::release_asset_name()?;
         let asset = release
             .assets
@@ -87,6 +100,43 @@ impl BinaryPreviewExtension {
 
         self.cached_binary_path = Some(binary_path.clone());
         Ok(binary_path)
+    }
+
+    fn cached_binary_path_on_disk() -> Option<String> {
+        let binary_name = if matches!(zed::current_platform().0, zed::Os::Windows) {
+            "binary-preview-lsp.exe"
+        } else {
+            "binary-preview-lsp"
+        };
+
+        fs::read_dir(".")
+            .ok()?
+            .filter_map(Result::ok)
+            .filter_map(|entry| {
+                let directory_name = entry.file_name();
+                if !directory_name
+                    .to_string_lossy()
+                    .starts_with("binary-preview-lsp-")
+                {
+                    return None;
+                }
+
+                let path = entry.path().join(binary_name);
+                let metadata = path.metadata().ok()?;
+                if !metadata.is_file() {
+                    return None;
+                }
+
+                let modified = metadata.modified().unwrap_or(SystemTime::UNIX_EPOCH);
+                Some((modified, path))
+            })
+            .max_by_key(|(modified, _)| *modified)
+            .and_then(|(_, path)| Self::relative_path(path))
+    }
+
+    fn relative_path(path: PathBuf) -> Option<String> {
+        let path = path.strip_prefix(Path::new(".")).unwrap_or(&path);
+        path.to_str().map(str::to_owned)
     }
 }
 
