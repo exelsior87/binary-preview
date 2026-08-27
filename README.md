@@ -36,8 +36,6 @@ C, C++, Rust, and Python files and downloads the matching
 Prebuilt executables are published for:
 
 - Windows x86_64
-- Linux x86_64
-- macOS x86_64
 - macOS Apple Silicon
 
 ![Binary Preview hover demo](assets/binary-preview-demo.gif)
