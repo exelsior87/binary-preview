@@ -40,6 +40,15 @@ Prebuilt executables are published for:
 
 ![Binary Preview hover demo](assets/binary-preview-demo.gif)
 
+## VS Code extension
+
+The VS Code extension is located in [`vscode-extension`](vscode-extension). It
+supports the same source languages and automatically downloads the matching LSP
+executable from GitHub Releases. For local development, set
+`binaryPreview.server.path` to a locally built `binary-preview-lsp` executable.
+If GitHub is unavailable, the extension falls back to the most recently
+downloaded executable in its local cache.
+
 ## Supported features
 
 - Source languages: C, C++, Rust, and Python
