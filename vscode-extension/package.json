@@ -3,7 +3,7 @@
   "displayName": "Binary Preview",
   "description": "Preview numeric literals and binary files from source code using hover information.",
   "version": "0.1.0",
-  "publisher": "ontto",
+  "publisher": "exelsior87",
   "icon": "icon.png",
   "license": "MIT",
   "repository": {
