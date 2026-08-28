@@ -1,5 +1,5 @@
 {
-  "name": "binary-preview",
+  "name": "binary-preview-vscode",
   "displayName": "Binary Preview",
   "description": "Preview numeric literals and binary files from source code using hover information.",
   "version": "0.1.0",
