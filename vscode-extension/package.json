@@ -1,0 +1,70 @@
+{
+  "name": "binary-preview",
+  "displayName": "Binary Preview",
+  "description": "Preview numeric literals and binary files from source code using hover information.",
+  "version": "0.1.0",
+  "publisher": "ontto",
+  "icon": "icon.png",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/exelsior87/binary-preview.git"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "binary",
+    "hex",
+    "hover",
+    "elf",
+    "pe",
+    "mach-o"
+  ],
+  "activationEvents": [
+    "onLanguage:c",
+    "onLanguage:cpp",
+    "onLanguage:rust",
+    "onLanguage:python",
+    "onCommand:binaryPreview.restartServer"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "binaryPreview.restartServer",
+        "title": "Binary Preview: Restart Language Server"
+      }
+    ],
+    "configuration": {
+      "title": "Binary Preview",
+      "properties": {
+        "binaryPreview.server.path": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "Path to a binary-preview-lsp executable. When empty, the latest release is downloaded automatically."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.0.0",
+    "typescript": "^5.5.3"
+  }
+}

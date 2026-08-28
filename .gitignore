@@ -3,6 +3,7 @@
 
 # Rust build output
 target/
+binary-preview-lsp/.target-test/
 zed-extension/extension.wasm
 
 # Python cache and virtual environments
@@ -16,3 +17,6 @@ venv/
 .vscode/
 *.swp
 *~
+vscode-extension/node_modules/
+vscode-extension/dist/
+vscode-extension/*.vsix
